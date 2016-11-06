@@ -3,19 +3,19 @@ def prompt(prompt_in)
 end
 
 def valid_number?(string_to_check)
-  string_to_check.to_i != 0
+  string_to_check.to_i.nonzero?
 end
 
 def operation_to_message(operation_in)
-  case operation_in 
-        when '1' 
-          'Adding'
-        when '2' 
-          'Subtracting'
-        when '3' 
-          'Multiplying'
-        when '4' 
-          'Dividing'
+  case operation_in
+  when '1'
+    'Adding'
+  when '2'
+    'Subtracting'
+  when '3'
+    'Multiplying'
+  when '4'
+    'Dividing'
   end
 end
 
@@ -38,7 +38,7 @@ loop do
     prompt('What\'s the first number')
     number1 = Kernel.gets().chomp()
     if valid_number?(number1)
-      break()
+      break
     else
       prompt('Hmmmm... Please type in a number')
     end
@@ -49,7 +49,7 @@ loop do
     prompt('What\'s the second number')
     number2 = Kernel.gets().chomp()
     if valid_number?(number2)
-      break()
+      break
     else
       prompt('Hmmmm... Please type in a number')
     end
@@ -57,10 +57,10 @@ loop do
 
   operation = ''
   operator_prompt = <<-MSG
-  What operation do you want 
-    1) add 
-    2) subtract 
-    3) multiple 
+  What operation do you want
+    1) add
+    2) subtract
+    3) multiple
     4) divide
   MSG
 
@@ -73,17 +73,17 @@ loop do
       prompt(operator_prompt)
     end
   end
-  
-  result = case operation 
-        when '1' 
-          number1.to_i + number2.to_i
-        when '2' 
-          number1.to_i - number2.to_i
-        when '3' 
-          number1.to_i * number2.to_i
-        when '4' 
-          number1.to_f / number2.to_f
-  end
+  result =
+    case operation
+    when '1'
+      number1.to_i + number2.to_i
+    when '2'
+      number1.to_i - number2.to_i
+    when '3'
+      number1.to_i * number2.to_i
+    when '4'
+      number1.to_f / number2.to_f
+    end
   prompt("#{operation_to_message(operation)} #{number1} and #{number2} ")
   prompt('The result is: ' + result.to_s + '!')
   prompt('Do you want to perfomr another calculation? Y to continue')
@@ -91,4 +91,3 @@ loop do
   break unless answer.downcase().start_with?('y')
 end
 prompt('Goodbye!')
-
