@@ -1,0 +1,73 @@
+START start of the program
+SET sets a variable we can use for later
+GET retrieve input from user
+PRINT displays output to user
+READ  retrieve value from variable
+IF / ELSE IF / ELSE show conditional branches in logic
+WHILE show looping logic
+END end of the program
+
+EXAMPLE
+START
+
+# Given a collection of integers called "numbers"
+
+SET iterator = 1
+SET saved_number = value within numbers collection at space 1
+
+WHILE iterator < length of numbers
+  SET current_number = value within numbers collection at space "iterator"
+  IF saved_number >= current_number
+    go to the next iteration
+  ELSE
+    saved_number = current_number
+  iterator = iterator + 1
+PRINT saved_number
+
+END
+
+# ==============
+
+1) a method that returns the sum of two integers
+2) a method that takes an array of strings, and returns a string that is all those strings concatenated together
+3) a method that takes an array of integers, and returns a new array with every other element
+
+
+# 1 -------------
+START
+  PRINT number1 + number2
+END
+
+# 2 -------------
+START
+
+# Given a collection of strings called "strings"
+SET strings = ['Hello','Michael']
+SET iterator = 1
+SET total_string = ''
+
+WHILE iterator < length of strings
+  SET current_string = value within strings collection at space "iterator"
+  total_string = total_string + current_string  
+  iterator = iterator + 1
+PRINT total_string
+END
+
+# 3) a method that takes an array of integers, and returns a new array with every other element
+
+START
+
+# Given a collection of integers called "numbers"
+SET numbers = [1,2,3]
+SET iterator = 1
+SET return_array = []
+
+WHILE iterator < length of numbers
+  SET current_number = value within numbers collection at space "iterator"
+  IF iterator/2 has a remainder
+    return_array. add new element (current_number)
+  iterator = iterator + 1
+
+PRINT return_array
+END
+
