@@ -1,9 +1,41 @@
+require 'yaml'
+
+# message file for calculator
+MESSAGES = YAML.load_file('calculator_messages.yml')
+LANGUAGE = 'en'
+
+# =========
+
+def messages(message, LANGUAGE)
+  MESSAGES[lang][message]
+end
+
 def prompt(prompt_in)
   Kernel.puts('=> ' + prompt_in)
 end
 
 def valid_number?(string_to_check)
   string_to_check.to_i.nonzero?
+end
+
+def number?(input)
+  integer?(input) || float?(input)
+end
+
+def integer?(input)
+  input.to_i.to_s == input
+end
+
+def integer_regex?(input)
+  /^\d+$/.match(input)
+end
+
+def integer_converter?(input)
+  Integer(input) rescue false
+end
+
+def float?(input)
+  Float(input) rescue false
 end
 
 def operation_to_message(operation_in)
@@ -19,13 +51,15 @@ def operation_to_message(operation_in)
   end
 end
 
-prompt('Welcome to calculator')
+# ============ Main thread of app ========
+
+prompt(messages('welcome'))
 name = ''
 loop do
-  prompt('What\'s you name?')
+  prompt(messages('valid_name'))
   name = Kernel.gets().chomp()
   if name.empty?
-    prompt('Please type your name')
+    prompt('....Please type your name')
   else
     break
   end
@@ -37,10 +71,14 @@ loop do
   loop do
     prompt('What\'s the first number')
     number1 = Kernel.gets().chomp()
+    # puts integer?(number1)
+    # puts integerRegEx?(number1)
+    # puts integerConverter?(number1)
+    puts number?(number1)
     if valid_number?(number1)
       break
     else
-      prompt('Hmmmm... Please type in a number')
+      prompt(messages('valid_number_error'))
     end
   end
 
@@ -51,7 +89,7 @@ loop do
     if valid_number?(number2)
       break
     else
-      prompt('Hmmmm... Please type in a number')
+      prompt(messages('valid_number_error'))
     end
   end
 
@@ -76,18 +114,19 @@ loop do
   result =
     case operation
     when '1'
-      number1.to_i + number2.to_i
+      number1.to_f + number2.to_f
     when '2'
-      number1.to_i - number2.to_i
+      number1.to_f - number2.to_f
     when '3'
-      number1.to_i * number2.to_i
+      number1.to_f * number2.to_f
     when '4'
       number1.to_f / number2.to_f
     end
   prompt("#{operation_to_message(operation)} #{number1} and #{number2} ")
   prompt('The result is: ' + result.to_s + '!')
-  prompt('Do you want to perfomr another calculation? Y to continue')
+  prompt(messages('continue'))
   answer = Kernel.gets().chomp()
   break unless answer.downcase().start_with?('y')
 end
-prompt('Goodbye!')
+prompt(messages('goodbye'))
+
