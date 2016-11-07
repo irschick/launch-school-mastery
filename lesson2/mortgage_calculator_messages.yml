@@ -1,0 +1,12 @@
+en:
+  welcome: "Welcome to Mortgage Calculator! Enter your name:"
+  valid_name: "Make sure to enter a valid name."
+  valid_number_error: 'Hmmmm... Please type in a number'
+  continue: 'Do you want to perfomr another mortgage calculation? Y to continue'
+  goodbye: 'Goodbye!!! It was fun calculating a mortgage with you ;0'
+es:
+  welcome: "Welcome to Mortgage Calculator! Enter your name:"
+  valid_name: "Make sure to enter a valid name."
+  valid_number_error: 'Hmmmm... Please type in a number'
+  continue: 'Do you want to perfomr another mortgage calculation? Y to continue'
+  goodbye: 'Goodbye!!! It was fun calculating a mortgage with you ;0'

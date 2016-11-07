@@ -6,8 +6,8 @@ LANGUAGE = 'en'
 
 # =========
 
-def messages(message, LANGUAGE)
-  MESSAGES[lang][message]
+def messages(message)
+  MESSAGES[LANGUAGE][message]
 end
 
 def prompt(prompt_in)
