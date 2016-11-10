@@ -33,8 +33,10 @@ loop do
     end
   end
   computer_choice = VALID_CHOICES.sample()
+
   prompt("You chose: #{choice}; computer_choice: #{computer_choice}")
   display_results(choice, computer_choice)
+
   prompt("Play again (Y to continue)?")
   answer = Kernel.gets().chomp()
   break unless answer.downcase().start_with?('y')
