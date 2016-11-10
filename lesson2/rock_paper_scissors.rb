@@ -1,13 +1,15 @@
-VALID_CHOICES = ['rock', 'paper', 'scissors']
+VALID_CHOICES = %w(rock paper scissors)
+
+def win?(first, second) 
+  (first == 'rock' && second == 'scissors') ||
+  (first == 'paper' && second == 'rock') ||
+  (first == 'scissors' && second == 'paper')
+end
 
 def display_results(user_choice, computer_choice)
-  if  (user_choice == 'rock' && computer_choice == 'scissors') ||
-      (user_choice == 'paper' && computer_choice == 'rock') ||
-      (user_choice == 'scissors' && computer_choice == 'paper')
+  if win?(user_choice, computer_choice)
     prompt("You won")
-  elsif (user_choice == 'rock' && computer_choice == 'paper') ||
-        (user_choice == 'paper' && computer_choice == 'scissors') ||
-        (user_choice == 'scissors' && computer_choice == 'rock')
+  elsif win?(computer_choice, user_choice)
     prompt("You lost")
   else
     prompt("You tied")
