@@ -30,6 +30,22 @@ def translate(short_choice)
     end
 end
 
+def reverse_translate(choice)
+  result =
+    case choice
+    when 'scissors'
+      'sc'
+    when 'spock'
+      'sp'
+    when 'paper'
+      'p'
+    when 'rock'
+      'r'
+    when 'lizard'
+      'l'
+    end
+end
+
 def display_results_short(user_choice, computer_choice)
   if win_short?(user_choice, computer_choice)
     prompt("You won")
@@ -50,11 +66,15 @@ end
 user_wins = 0
 loop do
   choice = ''
+
   loop do
     prompt("Choose one: #{VALID_CHOICES.join(', ')}")
     choice = Kernel.gets().chomp()
 
     if VALID_CHOICES_SHORT.include?(choice)
+      break
+    elsif VALID_CHOICES.include?(choice)
+      choice = reverse_translate(choice)
       break
     else
       prompt("That's not a valid choice")
