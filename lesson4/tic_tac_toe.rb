@@ -9,6 +9,8 @@
 # 9. If yes, go to #1
 # 10. Good bye!
 
+require 'readline'
+
 class TicTacToe 
   require 'yaml'
   MESSAGES = YAML.load_file('tic_tack_toe.yaml')
@@ -75,6 +77,7 @@ class TicTacToe
     %w(1 2 3 4 5 6 7 8 9).include?(square_in.to_s)
   end
 
+  # look for winnning square in a row
   def row_winner_square(display_in, who_to_check)
     square_to_win = 0
     (0..2).each do |row|
@@ -93,6 +96,7 @@ class TicTacToe
     square_to_win 
   end
 
+  # look for winnning square in a col
   def col_winner_square(display_in, who_to_check)
     square_to_win = 0
     (0..2).each do |col|
@@ -111,17 +115,9 @@ class TicTacToe
     square_to_win 
   end
 
+  # look for winnning square in a diag
   def diag_winner_square(display_in, who_to_check)
     square_to_win = 0
-
-    puts display_in[1] == who_to_check
-    puts display_in[5] == EMPTY_SQUARE
-    puts display_in[9] == who_to_check
-
-    if display_in[1] == who_to_check && display_in[5] == EMPTY_SQUARE && display_in[9] == who_to_check
-      puts 'Square 5 available'
-      square_to_win = 5
-    end
     if (display_in[1] == who_to_check && display_in[5] == who_to_check && display_in[9] == EMPTY_SQUARE)
       square_to_win = 9
     elsif (display_in[1] == who_to_check && display_in[5] == EMPTY_SQUARE && display_in[9] == who_to_check)
@@ -213,12 +209,6 @@ class TicTacToe
     new_board
   end
 
-  def board_test(display_in, setup_type)
-    display_in[1] = COMPUTER_MARK
-    display_in[4] = COMPUTER_MARK
-    display_in
-  end
-
   def user_choice!(display_in)
     loop do # ask until user picks a non empty square
       free_values = all_free_squares(display_in).keys.to_a
@@ -247,11 +237,11 @@ class TicTacToe
     puts "computer can win???"
     winner_square = 0
     if winner_square == 0
-      puts "computer can't win yet... look at rows"
+      puts "computer can't win yet... First look at rows"
       winner_square = row_winner_square(display_in, COMPUTER_MARK) 
     end
     if winner_square == 0
-      puts "computer can't win yet look at cols"
+      puts "computer can't win yet ... look at cols"
       winner_square = col_winner_square(display_in, COMPUTER_MARK) 
     end
     if winner_square == 0
@@ -261,18 +251,71 @@ class TicTacToe
     winner_square
   end
 
+  # If computer is about to lose and there is a square to defend then return it
+  def computer_can_lose(display_in)
+    protecting_square = 0
+    if protecting_square == 0
+      puts "computer can lose???.. First look at rows"
+      protecting_square = row_winner_square(display_in, USER_MARK) 
+    end
+    if protecting_square == 0
+      puts "computer can lose???.. First look at rows"
+      protecting_square = col_winner_square(display_in, USER_MARK) 
+    end
+    if protecting_square == 0
+      puts "computer can lose??... so check diagonals"
+      protecting_square = diag_winner_square(display_in, USER_MARK) 
+    end
+    protecting_square
+  end
+
   # computer chooses a free squre
   def computer_choice!(display_in)
+    # try to win
     winner_square = can_computer_win?(display_in)
     puts winner_square
     if winner_square != 0 
       add_piece_to_boaard(display_in, COMPUTER_MARK, winner_square)
     else
-      free_square_value = free_square(display_in)
-      if free_square_value.nonzero? # not empty board
-        add_piece_to_boaard(display_in, COMPUTER_MARK, free_square_value)
+      # try to avoid loss
+      protect_square = computer_can_lose(display_in) 
+      puts "Avoid Loss::: #{protect_square}"
+      if protect_square != 0 
+        add_piece_to_boaard(display_in, COMPUTER_MARK, protect_square)
+      else
+        # find a free square since I can't win and I am not about to lose
+        free_square_value = free_square(display_in)
+        if free_square_value.nonzero? # not empty board
+          add_piece_to_boaard(display_in, COMPUTER_MARK, free_square_value)
+        end
       end
     end
+  end
+
+  # who goes first
+  def who_goes_when
+    require 'readline'
+    who = ''
+    who_goes_first = USER_MARK
+    who_goes_second = COMPUTER_MARK
+    loop do
+      prompt("Who goes first?? push 'c' or 'C' for computer, 'u' or 'U' for user")
+      who = Readline.readline
+      if who.empty?
+        prompt('....Please type a correct answer')
+      elsif who == 'U' or who == 'u'
+        puts 'user will go first'
+        who_goes_first = USER_MARK
+        who_goes_second = COMPUTER_MARK
+        break
+      elsif who == 'c' or who == 'C'
+        puts 'computer will go first'
+        who_goes_first = COMPUTER_MARK
+        who_goes_second = USER_MARK
+        break
+      end
+    end
+    return who_goes_first, who_goes_second
   end
 
   # get the user name
@@ -308,7 +351,16 @@ class TicTacToe
     return game_over, winner_check
   end
 
-  # File:  tc_tic_tac_toe.rb
+  # play a move for someone
+  def play_move(display_in, who)
+    if who == COMPUTER_MARK
+      computer_choice!(display_in)
+    else # user gets to go
+      user_choice!(display_in)
+    end
+    game_over, winner = game_over?(display_in)
+    return game_over, winner
+  end
 
   def play
     # ========== main loop
@@ -318,21 +370,21 @@ class TicTacToe
     display_name # get user name
 
     loop do # loop until user does not want to play a new game anymore
+      who_goes_first, who_goes_second = who_goes_when()
       display = init_board # display keeps track of board state
       display_board(display)
       is_game_over = false
       winner = NO_WINNER
 
       loop do # while no winner or not board full
-        user_choice!(display)
-        is_game_over, winner = game_over?(display)
+        is_game_over, winner = play_move(display, who_goes_first)
         break unless is_game_over == false
-        computer_choice!(display)
-        is_game_over, winner = game_over?(display)
+        is_game_over, winner = play_move(display, who_goes_second)
         break unless is_game_over == false
       end # while no winner or board full
 
       puts 'Lets see who won'
+      puts winner
       case winner # keep track of winning progress
         when USER_WINNER
           user_won += 1
@@ -349,7 +401,7 @@ class TicTacToe
       # winner or board full
       prompt("You won #{user_won} and the computer won #{computer_won}")
       prompt(messages('continue')) # do you want to continue
-      answer = Kernel.gets.chomp
+      answer = Readline.readline
       break unless answer.downcase.start_with?('y')
     end
     prompt(messages('goodbye'))
