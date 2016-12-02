@@ -61,17 +61,6 @@ class TicTacToe
     prompt(msg)
   end
 
-  def joinor(arr, delimiter=', ', word='or')
-    case arr.size
-    when 0 then ''
-    when 1 then arr.first
-    when 2 then arr.join(" #{word} ")
-    else
-      arr[-1] = "#{word} #{arr.last}"
-      arr.join(delimiter)
-    end
-  end
-
   # is this a squqre 1..9
   def valid_square?(square_in)
     %w(1 2 3 4 5 6 7 8 9).include?(square_in.to_s)
@@ -181,11 +170,11 @@ class TicTacToe
   def winner?(display_in)
     winner = NO_WINNER
     if check_winner(display_in, COMPUTER_MARK)
-      winner = COMPUTER_WINNER
+      winner = COMPUTER_WINNER # computer wins
     elsif check_winner(display_in, USER_MARK)
-      winner = USER_WINNER
+      winner = USER_WINNER # user wins
     end
-    winner
+    winner # return winner
   end
 
   # all free squares that are not occupied
@@ -193,22 +182,38 @@ class TicTacToe
     display_in.select { |_k, v| v != COMPUTER_MARK && v != USER_MARK }
   end
 
+  # random free square for the computer if the computer needs a square
   def free_square(display_in)
-    free_squares = all_free_squares(display_in)
-    free_squares_array = free_squares.to_a
-    free_squares_array.sample[0].to_i
+    free_squares = all_free_squares(display_in) # all free squares
+    free_squares_array = free_squares.to_a # all free squares in an array
+    free_squares_array.sample[0].to_i # get a sample one
   end
 
+  # is the board full?
   def board_full?(display_in)
     !display_in.value?(' ')
   end
 
+  # initialize board to empty squares
   def init_board
     new_board = {}
     (1..9).each { |num| new_board[num] = EMPTY_SQUARE }
     new_board
   end
 
+  # helper method to concat all free squares and display in a prompt for the user to choose
+  def joinor(arr, delimiter=', ', word='or')
+    case arr.size
+    when 0 then ''
+    when 1 then arr.first
+    when 2 then arr.join(" #{word} ")
+    else
+      arr[-1] = "#{word} #{arr.last}"
+      arr.join(delimiter)
+    end
+  end
+
+  # controls the user choice, ask user for a free square
   def user_choice!(display_in)
     loop do # ask until user picks a non empty square
       free_values = all_free_squares(display_in).keys.to_a
@@ -233,6 +238,7 @@ class TicTacToe
     display_board(display_in)
   end
 
+  # can computer win?  First check rows, then cols, then diag
   def can_computer_win?(display_in)
     puts "computer can win???"
     winner_square = 0
@@ -254,12 +260,13 @@ class TicTacToe
   # If computer is about to lose and there is a square to defend then return it
   def computer_can_lose(display_in)
     protecting_square = 0
+    # if protecting square != 0 then a loss is possible
     if protecting_square == 0
       puts "computer can lose???.. First look at rows"
       protecting_square = row_winner_square(display_in, USER_MARK) 
     end
     if protecting_square == 0
-      puts "computer can lose???.. First look at rows"
+      puts "computer can lose???.. First look at cols"
       protecting_square = col_winner_square(display_in, USER_MARK) 
     end
     if protecting_square == 0
@@ -274,13 +281,13 @@ class TicTacToe
     # try to win
     winner_square = can_computer_win?(display_in)
     puts winner_square
-    if winner_square != 0 
+    if winner_square != 0 # can win, pick the winner
       add_piece_to_boaard(display_in, COMPUTER_MARK, winner_square)
     else
       # try to avoid loss
       protect_square = computer_can_lose(display_in) 
       puts "Avoid Loss::: #{protect_square}"
-      if protect_square != 0 
+      if protect_square != 0 # about to lose, so pick the protecting square
         add_piece_to_boaard(display_in, COMPUTER_MARK, protect_square)
       else
         # find a free square since I can't win and I am not about to lose
@@ -292,7 +299,7 @@ class TicTacToe
     end
   end
 
-  # who goes first
+  # who goes first and second
   def who_goes_when
     require 'readline'
     who = ''
@@ -334,8 +341,8 @@ class TicTacToe
     prompt("Hello #{name}")
   end
 
+  # checks to see if there is a winner or board full
   def game_over?(display_in)
-    board_full = board_full?(display_in)
     winner_check = winner?(display_in)
     game_over = false
     if winner_check == USER_WINNER
@@ -344,8 +351,8 @@ class TicTacToe
     elsif winner_check == COMPUTER_WINNER
       prompt("***** Computer won!!")
       game_over = true
-    elsif board_full == true
-      prompt("board is full")
+    elsif board_full?(display_in)
+      prompt("**** Board is full")
       game_over = true
     end
     return game_over, winner_check
@@ -362,49 +369,50 @@ class TicTacToe
     return game_over, winner
   end
 
-  def play
-    # ========== main loop
+  # plays one game
+  def play_game
+    who_goes_first, who_goes_second = who_goes_when()
+    display = init_board # display keeps track of board state
+    display_board(display)
+    winner = NO_WINNER
+    loop do # while no winner or not board full
+      is_game_over, winner = play_move(display, who_goes_first)
+      break unless !is_game_over
+      is_game_over, winner = play_move(display, who_goes_second)
+      break unless !is_game_over
+    end # while no winner or board full  
+    winner  
+  end
+  
+  # keeps track of the total game session
+  def play_session
+    # These keep track of wins for user, computer and board full (non winner)
     computer_won = 0
     user_won = 0
     no_one_won = 0
-    display_name # get user name
-
+    
     loop do # loop until user does not want to play a new game anymore
-      who_goes_first, who_goes_second = who_goes_when()
-      display = init_board # display keeps track of board state
-      display_board(display)
-      is_game_over = false
-      winner = NO_WINNER
-
-      loop do # while no winner or not board full
-        is_game_over, winner = play_move(display, who_goes_first)
-        break unless is_game_over == false
-        is_game_over, winner = play_move(display, who_goes_second)
-        break unless is_game_over == false
-      end # while no winner or board full
-
-      puts 'Lets see who won'
-      puts winner
+      winner = play_game
+      # game is over now
       case winner # keep track of winning progress
         when USER_WINNER
           user_won += 1
         when COMPUTER_WINNER
           computer_won += 1
         else
-          no_one_won += 1
-      end  
-      # break unless user_won == MAX_WINS || COMPUTER_WINNER == MAX_WINS
-      if user_won == MAX_WINS || COMPUTER_WINNER == MAX_WINS
-        puts "max wins"
-        break
+          no_one_won += 1 # board was full
       end
-      # winner or board full
-      prompt("You won #{user_won} and the computer won #{computer_won}")
+      # check progress towards max wins  
+      break unless user_won < MAX_WINS && computer_won < MAX_WINS # someone has max wins
+      
+      # show progress and ask user if they want to continue
+      prompt("You won #{user_won} and the computer won #{computer_won}") 
       prompt(messages('continue')) # do you want to continue
       answer = Readline.readline
       break unless answer.downcase.start_with?('y')
     end
+    # max wins or user does not want to play anymore
     prompt(messages('goodbye'))
+    prompt("You won #{user_won} and the computer won #{computer_won}")
   end
 end
-
