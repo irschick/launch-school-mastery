@@ -148,7 +148,7 @@ def dealer_move(deck, user_hand, dealer_hand)
       draw_card(deck, dealer_hand)
       display_hands(user_hand, dealer_hand)
     elsif dealor_total >= STAY_DEALER && dealor_total <= MAX
-      puts 'dealer stays'
+      puts 'dealer stays at >17'
       if dealor_total > user_total
         puts 'dealer wins'
         winner = :dealer
@@ -200,7 +200,7 @@ loop do
   when :dealer
     computer_won += 1
   else
-    no_one_won += 1 # board was full
+    no_one_won += 1 # push
   end
   prompt("Game over, push a key to play again")
   prompt("You won #{user_won} and the computer won #{computer_won}")
